@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Security Audit HUD</title>
+    <style>
+        /* Desain HUD Cyberpunk */
+        body { 
+            background-color: #050505; 
+            color: #00f2ff; 
+            font-family: 'Courier New', Courier, monospace; 
+            margin: 0; 
+            padding: 20px;
+        }
+        .container { 
+            border: 2px solid #00f2ff; 
+            padding: 25px; 
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3); 
+            max-width: 800px; 
+            margin: auto; 
+            background: rgba(0, 10, 15, 0.8);
+        }
+        h1 { 
+            text-transform: uppercase; 
+            border-bottom: 2px solid #00f2ff; 
+            padding-bottom: 10px; 
+            letter-spacing: 3px;
+        }
+        .score-box { 
+            font-size: 4em; 
+            text-align: center; 
+            margin: 30px 0; 
+            color: #fff; 
+            text-shadow: 0 0 15px #00f2ff; 
+        }
+        .list-item { 
+            border-left: 4px solid #00f2ff; 
+            padding: 12px; 
+            margin: 10px 0; 
+            background: rgba(0, 242, 255, 0.05); 
+        }
+        .status-text { color: #fff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Monitoring Object: System Audit</h1>
+        <div id="status">Status: <span class="status-text" id="scan-status">Menunggu Sinkronisasi...</span></div>
+        
+        <div class="score-box" id="score-display">--%</div>
+        
+        <h3>Saran Perbaikan:</h3>
+        <div id="suggestions">
+            <div class="list-item">Menunggu data scan dari server...</div>
+        </div>
+    </div>
+
+    <script>
+        function updateDashboard() {
+            fetch('/api/audit')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.skor !== undefined) {
+                        document.getElementById('score-display').innerText = data.skor + "%";
+                        document.getElementById('scan-status').innerText = "Aktif";
+                        
+                        const sugDiv = document.getElementById('suggestions');
+                        sugDiv.innerHTML = ''; // Reset daftar
+                        
+                        data.saran.forEach(item => {
+                            const div = document.createElement('div');
+                            div.className = 'list-item';
+                            div.innerText = "> " + item;
+                            sugDiv.appendChild(div);
+                        });
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('scan-status').innerText = "Menunggu Server...";
+                    console.log('Server belum merespons:', err);
+                });
+        }
+
+        // Update setiap 5 detik secara otomatis
+        setInterval(updateDashboard, 5000);
+        updateDashboard();
+    </script>
+</body>
+</html>
+
