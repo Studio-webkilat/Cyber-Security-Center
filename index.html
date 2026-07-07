@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Cyber Security Audit HUD</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="scan-line"></div>
+    <div class="dashboard-grid">
+        <div class="hud-panel">
+            <h1>Monitoring Object: System Audit</h1>
+            <div class="score-box" id="score-display">--%</div>
+            <div id="status">Status: <span id="scan-status">Aktif</span></div>
+        </div>
+        <div class="hud-panel">
+            <h2>Saran Perbaikan</h2>
+            <div id="suggestions"></div>
+        </div>
+    </div>
+    <script>
+        function updateDashboard() {
+            fetch('/api/audit')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('score-display').innerText = data.skor + "%";
+                    const s = document.getElementById('suggestions');
+                    s.innerHTML = '';
+                    data.saran.forEach(item => {
+                        const d = document.createElement('div');
+                        d.className = 'list-item';
+                        d.innerText = "> " + item;
+                        s.appendChild(d);
+                    });
+                });
+        }
+        setInterval(updateDashboard, 5000);
+        updateDashboard();
+    </script>
+</body>
+</html>
+
